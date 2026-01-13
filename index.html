@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple QR Code Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 8px 12px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #qrcode {
+      margin: 30px auto 20px;
+      padding: 15px;
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .actions {
+      margin-top: 20px;
+    }
+    .info {
+      color: #7f8c8d;
+      font-size: 0.95em;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>QR Code Generator</h1>
+  
+  <input type="text" id="urlInput" placeholder="Enter URL[](https://example.com)" autofocus />
+  
+  <div id="qrcode"></div>
+  
+  <div class="actions">
+    <button onclick="generateQR()">Generate QR Code</button>
+    <button onclick="downloadPNG()">Download PNG</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <div class="info">
+    Press "Generate" after typing/pasting the URL
+  </div>
+</div>
+
+<script>
+// Global variables
+let qrCode = null;
+const qrContainer = document.getElementById("qrcode");
+const urlInput = document.getElementById("urlInput");
+
+// Generate QR when button clicked or Enter pressed
+function generateQR() {
+  const text = urlInput.value.trim();
+  
+  if (!text) {
+    alert("Please enter a URL first!");
+    return;
+  }
+
+  // Clear previous QR
+  qrContainer.innerHTML = "";
+
+  // Create new QR
+  qrCode = new QRCode(qrContainer, {
+    text: text,
+    width: 260,
+    height: 260,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H   // High error correction
+  });
+}
+
+// Download as PNG
+function downloadPNG() {
+  if (!qrContainer.querySelector("img")) {
+    alert("Generate a QR code first!");
+    return;
+  }
+
+  const img = qrContainer.querySelector("img");
+  const link = document.createElement("a");
+  link.download = "qrcode.png";
+  link.href = img.src;
+  link.click();
+}
+
+// Download as PDF (A5 size, centered QR)
+function downloadPDF() {
+  if (!qrContainer.querySelector("canvas")) {
+    alert("Generate a QR code first!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a5"
+  });
+
+  // Get QR canvas
+  const canvas = qrContainer.querySelector("canvas");
+  const imgData = canvas.toDataURL("image/png");
+
+  // Center the QR code on A5 page (148 × 210 mm)
+  const qrSize = 100; // mm
+  const x = (148 - qrSize) / 2;
+  const y = (210 - qrSize) / 2 - 10; // slightly above center
+
+  doc.addImage(imgData, "PNG", x, y, qrSize, qrSize);
+
+  // Optional: add text
+  doc.setFontSize(12);
+  doc.text("Scan to visit", 74, y + qrSize + 15, { align: "center" });
+  doc.text(urlInput.value.trim().substring(0, 40) + "...", 74, y + qrSize + 25, { align: "center" });
+
+  doc.save("qrcode.pdf");
+}
+
+// Allow Enter key to generate
+urlInput.addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    generateQR();
+  }
+});
+</script>
+
+</body>
+</html>
