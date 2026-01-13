@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple QR Code Generator</title>
+  <title>QR Code Tools</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Library for QR Scanning -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fa;
       display: flex;
       justify-content: center;
@@ -24,11 +26,53 @@
       max-width: 500px;
       width: 100%;
       text-align: center;
+      display: flex;
+      flex-direction: column;
     }
     h1 {
       color: #2c3e50;
+      margin-bottom: 20px;
+      margin-top: 0;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ecf0f1;
       margin-bottom: 25px;
     }
+    .tab {
+      flex: 1;
+      padding: 15px;
+      cursor: pointer;
+      color: #7f8c8d;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .tab:hover {
+      color: #3498db;
+      background: #f8f9fa;
+    }
+    .tab.active {
+      color: #3498db;
+      border-bottom: 2px solid #3498db;
+      margin-bottom: -2px;
+    }
+    
+    /* Panel Visibility */
+    .panel {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .panel.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Input & Buttons */
     input[type="text"] {
       width: 100%;
       padding: 12px;
@@ -37,141 +81,299 @@
       border-radius: 6px;
       margin-bottom: 20px;
       box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #3498db;
+      outline: none;
     }
     button {
       background: #3498db;
       color: white;
       border: none;
-      padding: 12px 24px;
-      font-size: 16px;
+      padding: 10px 20px;
+      font-size: 15px;
       border-radius: 6px;
       cursor: pointer;
-      margin: 8px 12px;
-      transition: background 0.2s;
+      margin: 5px;
+      transition: background 0.2s, transform 0.1s;
     }
     button:hover {
       background: #2980b9;
     }
+    button:active {
+      transform: scale(0.98);
+    }
+    button.secondary {
+      background: #95a5a6;
+    }
+    button.secondary:hover {
+      background: #7f8c8d;
+    }
+    button.success {
+      background: #27ae60;
+    }
+    button.success:hover {
+      background: #219150;
+    }
+
+    /* Generator Specific */
     #qrcode {
-      margin: 30px auto 20px;
+      margin: 20px auto;
       padding: 15px;
       background: white;
       border: 1px solid #eee;
       border-radius: 8px;
       display: inline-block;
+      min-height: 260px; /* Prevent layout shift */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .actions {
-      margin-top: 20px;
+    #qrcode img {
+      display: block; /* Fix spacing issues */
     }
+
+    /* Scanner Specific */
+    #reader {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      margin-bottom: 15px;
+    }
+    #scanResultContainer {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      margin-top: 15px;
+      text-align: left;
+    }
+    #scanResultText {
+      font-family: monospace;
+      word-break: break-all;
+      color: #2c3e50;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 10px 0;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    .status-msg {
+      color: #7f8c8d;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
     .info {
       color: #7f8c8d;
-      font-size: 0.95em;
-      margin-top: 30px;
+      font-size: 0.85em;
+      margin-top: 25px;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>QR Code Generator</h1>
+  <h1>QR Code Tools</h1>
   
-  <input type="text" id="urlInput" placeholder="Enter URL[](https://example.com)" autofocus />
-  
-  <div id="qrcode"></div>
-  
-  <div class="actions">
-    <button onclick="generateQR()">Generate QR Code</button>
-    <button onclick="downloadPNG()">Download PNG</button>
-    <button onclick="downloadPDF()">Download PDF</button>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('generator')">Generator</div>
+    <div class="tab" onclick="switchTab('scanner')">Scanner</div>
   </div>
 
-  <div class="info">
-    Press "Generate" after typing/pasting the URL
+  <!-- GENERATOR PANEL -->
+  <div id="generator" class="panel active">
+    <input type="text" id="urlInput" placeholder="Enter URL or text to generate" />
+    
+    <div id="qrcode"></div>
+    
+    <div class="actions">
+      <button onclick="generateQR()">Generate</button>
+      <button onclick="downloadPNG()" class="secondary">Save PNG</button>
+      <button onclick="downloadPDF()" class="secondary">Save PDF</button>
+    </div>
+
+    <div class="info">
+      Enter text and click Generate.
+    </div>
+  </div>
+
+  <!-- SCANNER PANEL -->
+  <div id="scanner" class="panel">
+    <div id="reader"></div>
+    
+    <div id="scannerControls">
+       <div id="scannerStatus" class="status-msg">Camera permission required to scan.</div>
+       <button id="startScanBtn" onclick="startScanner()">Start Camera</button>
+       <button id="stopScanBtn" onclick="stopScanner()" style="display:none;" class="secondary">Stop Camera</button>
+    </div>
+
+    <div id="scanResultContainer" style="display:none">
+       <h3 style="margin-top:0; font-size:16px;">Scanned Data:</h3>
+       <div id="scanResultText"></div>
+       <button onclick="copyScanResult()" class="success">Copy Text</button>
+       <button onclick="resetScan()" class="secondary">Scan Another</button>
+    </div>
   </div>
 </div>
 
 <script>
-// Global variables
-let qrCode = null;
+// --- TABS LOGIC ---
+function switchTab(tabName) {
+  // Hide all panels
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+  // Show selected
+  document.getElementById(tabName).classList.add('active');
+  
+  // Highlight tab
+  const tabIndex = tabName === 'generator' ? 0 : 1;
+  document.querySelectorAll('.tab')[tabIndex].classList.add('active');
+
+  // If switching away from scanner, optionally stop it to save battery
+  if (tabName === 'generator' && html5QrcodeScanner) {
+     // Optional: stopScanner(); 
+  }
+}
+
+
+// --- GENERATOR LOGIC ---
+let qrCodeObj = null;
 const qrContainer = document.getElementById("qrcode");
 const urlInput = document.getElementById("urlInput");
 
-// Generate QR when button clicked or Enter pressed
 function generateQR() {
   const text = urlInput.value.trim();
-  
   if (!text) {
-    alert("Please enter a URL first!");
+    alert("Please enter some text or a URL!");
     return;
   }
 
-  // Clear previous QR
-  qrContainer.innerHTML = "";
-
-  // Create new QR
-  qrCode = new QRCode(qrContainer, {
+  qrContainer.innerHTML = ""; // Clear previous
+  qrCodeObj = new QRCode(qrContainer, {
     text: text,
-    width: 260,
-    height: 260,
+    width: 256,
+    height: 256,
     colorDark: "#000000",
     colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H   // High error correction
+    correctLevel: QRCode.CorrectLevel.H
   });
 }
 
-// Download as PNG
 function downloadPNG() {
-  if (!qrContainer.querySelector("img")) {
-    alert("Generate a QR code first!");
-    return;
-  }
-
   const img = qrContainer.querySelector("img");
+  if (!img) { alert("Generate a QR code first!"); return; }
+  
   const link = document.createElement("a");
   link.download = "qrcode.png";
   link.href = img.src;
   link.click();
 }
 
-// Download as PDF (A5 size, centered QR)
 function downloadPDF() {
-  if (!qrContainer.querySelector("canvas")) {
-    alert("Generate a QR code first!");
-    return;
-  }
+  const canvas = qrContainer.querySelector("canvas");
+  if (!canvas) { alert("Generate a QR code first!"); return; }
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a5"
-  });
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a5" });
 
-  // Get QR canvas
-  const canvas = qrContainer.querySelector("canvas");
   const imgData = canvas.toDataURL("image/png");
-
-  // Center the QR code on A5 page (148 × 210 mm)
-  const qrSize = 100; // mm
+  const qrSize = 100; 
   const x = (148 - qrSize) / 2;
-  const y = (210 - qrSize) / 2 - 10; // slightly above center
+  const y = (210 - qrSize) / 2 - 10;
 
   doc.addImage(imgData, "PNG", x, y, qrSize, qrSize);
-
-  // Optional: add text
-  doc.setFontSize(12);
-  doc.text("Scan to visit", 74, y + qrSize + 15, { align: "center" });
-  doc.text(urlInput.value.trim().substring(0, 40) + "...", 74, y + qrSize + 25, { align: "center" });
-
+  doc.setFontSize(10);
+  doc.text(urlInput.value.trim().substring(0, 40) + "...", 74, y + qrSize + 10, { align: "center" });
   doc.save("qrcode.pdf");
 }
 
-// Allow Enter key to generate
-urlInput.addEventListener("keypress", function(e) {
-  if (e.key === "Enter") {
-    generateQR();
-  }
+urlInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") generateQR();
 });
+
+
+// --- SCANNER LOGIC ---
+let html5QrcodeScanner = null;
+const scanResultContainer = document.getElementById('scanResultContainer');
+const scanResultText = document.getElementById('scanResultText');
+const scannerStatus = document.getElementById('scannerStatus');
+const startScanBtn = document.getElementById('startScanBtn');
+const stopScanBtn = document.getElementById('stopScanBtn');
+
+function startScanner() {
+  scannerStatus.innerText = "Initializing camera...";
+  
+  // Create instance if not exists
+  if (!html5QrcodeScanner) {
+      html5QrcodeScanner = new Html5Qrcode("reader");
+  }
+
+  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+  
+  // Prefer back camera
+  html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+  .then(() => {
+      scannerStatus.innerText = "Scanning... Point camera at a QR code.";
+      startScanBtn.style.display = "none";
+      stopScanBtn.style.display = "inline-block";
+      scanResultContainer.style.display = "none";
+  })
+  .catch(err => {
+      console.error(err);
+      scannerStatus.innerText = "Error starting camera: " + err;
+  });
+}
+
+function stopScanner() {
+  if (html5QrcodeScanner) {
+      html5QrcodeScanner.stop().then(() => {
+          scannerStatus.innerText = "Camera stopped.";
+          startScanBtn.style.display = "inline-block";
+          stopScanBtn.style.display = "none";
+      }).catch(err => {
+          console.error("Failed to stop", err);
+      });
+  }
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+  // Stop scanning after success (optional, creates better UX)
+  stopScanner();
+  
+  // Display result
+  scanResultText.innerText = decodedText;
+  scanResultContainer.style.display = "block";
+  scannerStatus.innerText = "QR Code detected!";
+}
+
+function onScanFailure(error) {
+  // handle scan failure, usually better to ignore and keep scanning.
+  // console.warn(`Code scan error = ${error}`);
+}
+
+function resetScan() {
+  scanResultContainer.style.display = "none";
+  startScanner();
+}
+
+function copyScanResult() {
+  const text = scanResultText.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = document.querySelector("#scanResultContainer button.success").innerText;
+    document.querySelector("#scanResultContainer button.success").innerText = "Copied!";
+    setTimeout(() => {
+        document.querySelector("#scanResultContainer button.success").innerText = originalText;
+    }, 2000);
+  }).catch(err => {
+    alert("Failed to copy: " + err);
+  });
+}
 </script>
 
 </body>
