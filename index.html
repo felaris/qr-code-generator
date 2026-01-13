@@ -1,497 +1,384 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Master | By Felix Kwamena Awortwe</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  
-  <!-- Modern Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --secondary: #64748b;
-      --success: #10b981;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --glass-bg: rgba(255, 255, 255, 0.95);
-      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg-gradient);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      color: #333;
-    }
-
-    .main-wrapper {
-      width: 100%;
-      max-width: 480px;
-      padding: 20px;
-      box-sizing: border-box;
-      animation: slideUp 0.6s ease-out;
-    }
-
-    .container {
-      background: var(--glass-bg);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: var(--glass-shadow);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      position: relative;
-      overflow: hidden;
-    }
-
-    h1 {
-      color: #1e293b;
-      margin: 0 0 25px 0;
-      font-weight: 600;
-      font-size: 24px;
-      text-align: center;
-      letter-spacing: -0.5px;
-    }
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>FastQR - Free No Payment No Account QR Code Generator 2026</title>
+    <meta name="description" content="FastQR is the best free no payment no account qr code generator in 2026. Generate unlimited QR codes and scan instantly without signing up.">
     
-    /* Tabs */
-    .tabs {
-      display: flex;
-      background: #f1f5f9;
-      padding: 5px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      position: relative;
-    }
-    .tab {
-      flex: 1;
-      padding: 10px;
-      cursor: pointer;
-      color: #64748b;
-      font-weight: 500;
-      text-align: center;
-      border-radius: 8px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
-    }
-    .tab.active {
-      background: white;
-      color: var(--primary);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      font-weight: 600;
-    }
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
-    /* Panel Transitions */
-    .panel {
-      display: none;
-      animation: fadeIn 0.4s ease-in-out;
-    }
-    .panel.active {
-      display: block;
-    }
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 
-    /* Form Elements */
-    .input-group {
-      position: relative;
-      margin-bottom: 25px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 15px;
-      font-size: 15px;
-      font-family: inherit;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      box-sizing: border-box;
-      transition: all 0.3s;
-      background: #f8fafc;
-    }
-    input[type="text"]:focus {
-      border-color: var(--primary);
-      background: white;
-      outline: none;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-    }
-    
-    /* Buttons */
-    .btn-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .btn-full {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px;
-      font-size: 14px;
-      font-weight: 500;
-      font-family: inherit;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-    }
-    button:active {
-      transform: translateY(0);
-    }
-    button.secondary {
-      background: white;
-      color: var(--secondary);
-      border: 2px solid #e2e8f0;
-    }
-    button.secondary:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      color: #475569;
-      box-shadow: none;
-    }
-    button.success {
-      background: var(--success);
-    }
-    button.success:hover {
-      background: #059669;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-    }
-
-    /* QR Display */
-    #qrcode {
-      margin: 10px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 280px;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.03);
-      transition: all 0.3s;
-    }
-    #qrcode img {
-      animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    /* Scanner */
-    #reader {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #000;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    .scanner-controls {
-      margin-top: 15px;
-      text-align: center;
-    }
-    #scanResultContainer {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 12px;
-      animation: slideUp 0.3s ease-out;
-    }
-    #scanResultText {
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      color: #166534;
-      word-break: break-all;
-      margin: 10px 0 15px;
-      font-weight: 600;
-    }
-
-    /* Footer / Credit */
-    .footer {
-      margin-top: 25px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 13px;
-      font-weight: 300;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .footer strong {
-      font-weight: 500;
-      color: #fff;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    /* Utilities */
-    .hidden { display: none !important; }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      background: #e2e8f0;
-      color: #64748b;
-      margin-bottom: 10px;
-    }
-  </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4f46e5", // Indigo-600
+                        "primary-hover": "#4338ca",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab {
+            border-bottom: 2px solid #4f46e5;
+            color: #4f46e5;
+        }
+        #reader {
+            width: 100%;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            position: relative;
+        }
+        /* Custom scrollbar for history */
+        .history-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .history-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col transition-colors duration-300">
 
-<div class="main-wrapper">
-  <div class="container">
-    <h1>QR Master</h1>
-    
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('generator')">Create</div>
-      <div class="tab" onclick="switchTab('scanner')">Scan</div>
+<!-- Header -->
+<header class="w-full px-6 py-4 flex items-center justify-between bg-white/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800">
+    <div class="flex items-center gap-2">
+        <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/30">
+            <span class="material-symbols-outlined">qr_code_scanner</span>
+        </div>
+        <h2 class="text-[#0d141b] dark:text-white text-xl font-bold tracking-tight">FastQR</h2>
     </div>
-
-    <!-- GENERATOR PANEL -->
-    <div id="generator" class="panel active">
-      <div class="input-group">
-        <input type="text" id="urlInput" placeholder="Enter link or text..." autocomplete="off" />
-      </div>
-      
-      <div id="qrcode">
-        <span style="color:#cbd5e1; font-style:italic;">Preview area</span>
-      </div>
-      
-      <div class="btn-grid">
-        <button onclick="downloadPNG()" class="secondary">
-          <span>↓ PNG</span>
-        </button>
-        <button onclick="downloadPDF()" class="secondary">
-          <span>↓ PDF</span>
-        </button>
-      </div>
-      <button onclick="generateQR()" class="btn-full">Generate QR Code</button>
+    <div class="flex gap-3">
+       <!-- Theme Toggle (Simplified) -->
+       <button onclick="document.documentElement.classList.toggle('dark')" class="flex items-center justify-center size-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <span class="material-symbols-outlined">contrast</span>
+       </button>
     </div>
+</header>
 
-    <!-- SCANNER PANEL -->
-    <div id="scanner" class="panel">
-      <div id="reader"></div>
-      
-      <div class="scanner-controls">
-         <div id="scannerStatus" class="status-badge">Camera Ready</div>
-         <div style="margin-top:10px;">
-           <button id="startScanBtn" onclick="startScanner()">Start Camera</button>
-           <button id="stopScanBtn" onclick="stopScanner()" class="secondary hidden">Stop Camera</button>
-         </div>
-      </div>
+<main class="flex-1 flex flex-col items-center justify-center px-4 py-8">
+    <div class="w-full max-w-[720px] space-y-6">
+        
+        <!-- Headlines -->
+        <div class="text-center space-y-2">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">Fast, Free, Instant.</h1>
+            <p class="text-gray-500 dark:text-gray-400 text-lg">The best free no payment no account qr code generator in 2026.</p>
+        </div>
 
-      <div id="scanResultContainer" class="hidden">
-         <div style="font-size:12px; color:#166534; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Detected Content</div>
-         <div id="scanResultText"></div>
-         <div class="btn-grid">
-            <button onclick="copyScanResult()" class="success">Copy</button>
-            <button onclick="resetScan()" class="secondary">Scan Again</button>
-         </div>
-      </div>
+        <!-- Main Card -->
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 overflow-hidden">
+            
+            <!-- Main Tabs -->
+            <div class="flex border-b border-gray-100 dark:border-gray-800">
+                <button onclick="switchMode('generate')" id="tab-generate" class="flex-1 py-4 text-center font-semibold text-sm uppercase tracking-widest text-primary border-b-2 border-primary hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    Generate
+                </button>
+                <button onclick="switchMode('scan')" id="tab-scan" class="flex-1 py-4 text-center font-semibold text-sm uppercase tracking-widest text-gray-400 border-b-2 border-transparent hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    Scan
+                </button>
+            </div>
+
+            <!-- GENERATOR VIEW -->
+            <div id="view-generate" class="p-8 md:p-10 space-y-8">
+                <div class="relative">
+                    <label class="block mb-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Content</label>
+                    <textarea id="urlInput" class="w-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl p-4 text-lg text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-0 resize-none min-h-[100px] transition-colors" placeholder="Type URL or text here..."></textarea>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="flex flex-col items-center justify-center">
+                    <div id="qrcode" class="p-6 bg-white border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center min-h-[260px] min-w-[260px]">
+                        <span class="text-gray-300 text-sm font-medium">QR Preview</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap justify-center gap-3">
+                     <button onclick="generateQR()" class="w-full md:w-auto px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">bolt</span>
+                        Generate
+                    </button>
+                    <div class="flex gap-3 w-full md:w-auto justify-center">
+                        <button onclick="downloadPNG()" class="px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">image</span> PNG
+                        </button>
+                        <button onclick="downloadPDF()" class="px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">picture_as_pdf</span> PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCANNER VIEW -->
+            <div id="view-scan" class="hidden p-6 md:p-10 space-y-6">
+                <div class="bg-black rounded-xl overflow-hidden relative min-h-[300px] flex items-center justify-center bg-gray-900">
+                    <div id="reader"></div>
+                    <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-2">
+                        <span class="material-symbols-outlined text-4xl">no_photography</span>
+                        <span class="text-sm">Camera inactive</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-4">
+                     <button id="startScanBtn" onclick="startScanner()" class="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-all shadow-lg shadow-primary/25">
+                        Start Camera
+                    </button>
+                     <button id="stopScanBtn" onclick="stopScanner()" class="hidden px-8 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/25">
+                        Stop Camera
+                    </button>
+                </div>
+
+                <!-- Result Area -->
+                <div id="scanResultContainer" class="hidden bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+                    <div class="flex justify-between items-start mb-2">
+                         <span class="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-widest">Detected Content</span>
+                         <button onclick="copyScanResult()" class="text-green-600 dark:text-green-400 hover:text-green-800 text-xs font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">content_copy</span> Copy
+                         </button>
+                    </div>
+                    <p id="scanResultText" class="font-mono text-sm text-green-900 dark:text-green-100 break-all"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section (inspired by Template 1) -->
+        <div class="pt-8">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 px-2">Recent Scans & Generations</h3>
+            <div id="history-list" class="flex gap-4 overflow-x-auto history-scroll pb-4 px-2">
+                <!-- History items will be injected here JS -->
+                <div class="text-gray-400 text-sm italic py-4">No history yet. Start creating!</div>
+            </div>
+        </div>
+
+        <!-- SEO Content Block -->
+        <article class="prose dark:prose-invert max-w-none text-center pt-10 pb-6 border-t border-gray-100 dark:border-gray-800 mt-10">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Why use FastQR?</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm max-w-2xl mx-auto leading-relaxed">
+                FastQR provides a completely <strong>free no payment no account qr code generator in 2026</strong>. 
+                Whether you need a quick link for a project or a professional code for business, our tool ensures 
+                privacy and speed. No sign-ups, no hidden fees, just instant QR codes.
+            </p>
+        </article>
+
     </div>
-  </div>
+</main>
 
-  <div class="footer">
-    Built by <strong>Felix Kwamena Awortwe</strong>
-  </div>
-</div>
+<footer class="py-8 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div class="max-w-[720px] mx-auto px-6 text-center space-y-2">
+        <p class="text-gray-900 dark:text-white font-medium">FastQR Project</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Built by <strong class="text-primary">Felix Kwamena Awortwe</strong></p>
+        <p class="text-xs text-gray-400 mt-4">© 2026 FastQR. All rights reserved.</p>
+    </div>
+</footer>
 
 <script>
-// --- TABS LOGIC ---
-function switchTab(tabName) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    // --- STATE & UTILS ---
+    const historyKey = 'fastqr_history';
+    let historyData = JSON.parse(localStorage.getItem(historyKey) || '[]');
 
-  document.getElementById(tabName).classList.add('active');
-  const tabIndex = tabName === 'generator' ? 0 : 1;
-  document.querySelectorAll('.tab')[tabIndex].classList.add('active');
+    function saveToHistory(type, content) {
+        const item = { type, content, date: new Date().toISOString() };
+        historyData.unshift(item);
+        if(historyData.length > 10) historyData.pop(); // Keep last 10
+        localStorage.setItem(historyKey, JSON.stringify(historyData));
+        renderHistory();
+    }
 
-  if (tabName === 'generator' && html5QrcodeScanner) {
-     stopScanner();
-  }
-}
+    function renderHistory() {
+        const container = document.getElementById('history-list');
+        if (historyData.length === 0) {
+            container.innerHTML = '<div class="text-gray-400 text-sm italic py-4 w-full text-center">No history yet.</div>';
+            return;
+        }
+        
+        container.innerHTML = historyData.map(item => `
+            <div class="min-w-[200px] bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col gap-2">
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${item.type === 'scan' ? 'text-green-500' : 'text-primary'}">
+                    <span class="material-symbols-outlined text-sm">${item.type === 'scan' ? 'qr_code_scanner' : 'qr_code_2'}</span>
+                    ${item.type}
+                </div>
+                <p class="text-sm text-gray-700 dark:text-gray-300 truncate font-mono" title="${item.content}">${item.content}</p>
+                <div class="text-[10px] text-gray-400">${new Date(item.date).toLocaleTimeString()}</div>
+            </div>
+        `).join('');
+    }
 
-// --- GENERATOR LOGIC ---
-let qrCodeObj = null;
-const qrContainer = document.getElementById("qrcode");
-const urlInput = document.getElementById("urlInput");
+    // --- TABS LOGIC ---
+    function switchMode(mode) {
+        // Toggle Buttons
+        const btnGen = document.getElementById('tab-generate');
+        const btnScan = document.getElementById('tab-scan');
+        const viewGen = document.getElementById('view-generate');
+        const viewScan = document.getElementById('view-scan');
 
-// Initialize with a default placeholder or empty
-function generateQR() {
-  const text = urlInput.value.trim();
-  if (!text) {
-    // Shake animation for error feedback
-    urlInput.style.borderColor = "#ef4444";
-    setTimeout(() => urlInput.style.borderColor = "#e2e8f0", 500);
-    return;
-  }
+        if (mode === 'generate') {
+            btnGen.classList.add('text-primary', 'border-primary');
+            btnGen.classList.remove('text-gray-400', 'border-transparent');
+            btnScan.classList.remove('text-primary', 'border-primary');
+            btnScan.classList.add('text-gray-400', 'border-transparent');
+            
+            viewGen.classList.remove('hidden');
+            viewScan.classList.add('hidden');
+            
+            stopScanner(); // Save resources
+        } else {
+            btnScan.classList.add('text-primary', 'border-primary');
+            btnScan.classList.remove('text-gray-400', 'border-transparent');
+            btnGen.classList.remove('text-primary', 'border-primary');
+            btnGen.classList.add('text-gray-400', 'border-transparent');
+            
+            viewScan.classList.remove('hidden');
+            viewGen.classList.add('hidden');
+        }
+    }
 
-  qrContainer.innerHTML = "";
-  qrCodeObj = new QRCode(qrContainer, {
-    text: text,
-    width: 240,
-    height: 240,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
-}
+    // --- GENERATOR LOGIC ---
+    let qrCodeObj = null;
+    const qrContainer = document.getElementById("qrcode");
+    const urlInput = document.getElementById("urlInput");
 
-function downloadPNG() {
-  const img = qrContainer.querySelector("img");
-  if (!img) { alert("Please generate a QR code first"); return; }
-  
-  const link = document.createElement("a");
-  link.download = "qr-code.png";
-  link.href = img.src;
-  link.click();
-}
+    function generateQR() {
+        const text = urlInput.value.trim();
+        if (!text) {
+            urlInput.focus();
+            urlInput.classList.add('border-red-500');
+            setTimeout(() => urlInput.classList.remove('border-red-500'), 1000);
+            return;
+        }
 
-function downloadPDF() {
-  const canvas = qrContainer.querySelector("canvas");
-  if (!canvas) { alert("Please generate a QR code first"); return; }
+        qrContainer.innerHTML = "";
+        qrCodeObj = new QRCode(qrContainer, {
+            text: text,
+            width: 250,
+            height: 250,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        saveToHistory('generate', text);
+    }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a5" });
-  const imgData = canvas.toDataURL("image/png");
-  
-  // A5 dimensions: 148 x 210
-  const qrSize = 100; 
-  const x = (148 - qrSize) / 2;
-  const y = (210 - qrSize) / 2 - 20;
+    function downloadPNG() {
+        const img = qrContainer.querySelector("img");
+        if (!img) { alert("Please generate a QR code first!"); return; }
+        
+        const link = document.createElement("a");
+        link.download = "fastqr-" + Date.now() + ".png";
+        link.href = img.src;
+        link.click();
+    }
 
-  doc.setFillColor(255, 255, 255);
-  doc.rect(0, 0, 148, 210, 'F'); // White background
-  
-  doc.addImage(imgData, "PNG", x, y, qrSize, qrSize);
-  
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(50, 50, 50);
-  doc.text("Scan Me", 74, y + qrSize + 10, { align: "center" });
-  
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  let text = urlInput.value.trim();
-  if(text.length > 40) text = text.substring(0, 37) + "...";
-  doc.text(text, 74, y + qrSize + 18, { align: "center" });
+    function downloadPDF() {
+        const canvas = qrContainer.querySelector("canvas");
+        if (!canvas) { alert("Please generate a QR code first!"); return; }
 
-  doc.save("qr-code.pdf");
-}
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const imgData = canvas.toDataURL("image/png");
+        
+        doc.setFontSize(22);
+        doc.text("FastQR", 105, 40, { align: "center" });
+        
+        const qrSize = 100;
+        const x = (210 - qrSize) / 2;
+        doc.addImage(imgData, "PNG", x, 50, qrSize, qrSize);
+        
+        doc.setFontSize(12);
+        doc.text(urlInput.value.trim().substring(0, 50), 105, 160, { align: "center" });
+        
+        doc.save("fastqr-" + Date.now() + ".pdf");
+    }
 
-urlInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") generateQR();
-});
+    urlInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") generateQR();
+    });
 
+    // --- SCANNER LOGIC ---
+    let html5QrcodeScanner = null;
+    
+    function startScanner() {
+        const placeholder = document.getElementById('camera-placeholder');
+        
+        if (!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5Qrcode("reader");
+        }
 
-// --- SCANNER LOGIC ---
-let html5QrcodeScanner = null;
-const scanResultContainer = document.getElementById('scanResultContainer');
-const scanResultText = document.getElementById('scanResultText');
-const scannerStatus = document.getElementById('scannerStatus');
-const startScanBtn = document.getElementById('startScanBtn');
-const stopScanBtn = document.getElementById('stopScanBtn');
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+        .then(() => {
+            document.getElementById('startScanBtn').classList.add('hidden');
+            document.getElementById('stopScanBtn').classList.remove('hidden');
+            placeholder.style.display = 'none';
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Could not start camera. Make sure you are on HTTPS or localhost.");
+        });
+    }
 
-function startScanner() {
-  scannerStatus.innerText = "Starting Camera...";
-  scannerStatus.style.background = "#e2e8f0";
-  
-  if (!html5QrcodeScanner) {
-      html5QrcodeScanner = new Html5Qrcode("reader");
-  }
+    function stopScanner() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                document.getElementById('startScanBtn').classList.remove('hidden');
+                document.getElementById('stopScanBtn').classList.add('hidden');
+                document.getElementById('camera-placeholder').style.display = 'flex';
+            }).catch(err => console.log(err));
+        }
+    }
 
-  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-  
-  html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
-  .then(() => {
-      scannerStatus.innerText = "Scanning active";
-      scannerStatus.style.background = "#bbf7d0";
-      scannerStatus.style.color = "#166534";
-      startScanBtn.classList.add('hidden');
-      stopScanBtn.classList.remove('hidden');
-      scanResultContainer.classList.add('hidden');
-  })
-  .catch(err => {
-      console.error(err);
-      scannerStatus.innerText = "Camera Error";
-      alert("Error accessing camera. Please ensure you are using HTTPS or localhost.");
-  });
-}
+    function onScanSuccess(decodedText, decodedResult) {
+        stopScanner();
+        const resultContainer = document.getElementById('scanResultContainer');
+        const resultText = document.getElementById('scanResultText');
+        
+        resultContainer.classList.remove('hidden');
+        resultText.innerText = decodedText;
+        
+        saveToHistory('scan', decodedText);
+        
+        // Audio feedback
+        // const beep = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'); // Optional
+    }
 
-function stopScanner() {
-  if (html5QrcodeScanner) {
-      html5QrcodeScanner.stop().then(() => {
-          scannerStatus.innerText = "Camera Stopped";
-          scannerStatus.style.background = "#e2e8f0";
-          scannerStatus.style.color = "#64748b";
-          startScanBtn.classList.remove('hidden');
-          stopScanBtn.classList.add('hidden');
-      }).catch(err => {
-          console.error("Failed to stop", err);
-      });
-  }
-}
+    function onScanFailure(error) {
+        // console.warn(`Code scan error = ${error}`);
+    }
 
-function onScanSuccess(decodedText, decodedResult) {
-  stopScanner();
-  scanResultText.innerText = decodedText;
-  scanResultContainer.classList.remove('hidden');
-  scannerStatus.innerText = "Success!";
-}
+    function copyScanResult() {
+        const text = document.getElementById('scanResultText').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Copied to clipboard!");
+        });
+    }
 
-function onScanFailure(error) {
-  // No-op for cleaner logs
-}
+    // Initialize
+    renderHistory();
 
-function resetScan() {
-  scanResultContainer.classList.add('hidden');
-  startScanner();
-}
-
-function copyScanResult() {
-  const text = scanResultText.innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector("#scanResultContainer button.success");
-    const originalText = btn.innerText;
-    btn.innerText = "Copied!";
-    setTimeout(() => { btn.innerText = originalText; }, 2000);
-  }).catch(err => {
-    alert("Copy failed");
-  });
-}
 </script>
-
 </body>
 </html>
