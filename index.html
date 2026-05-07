@@ -99,6 +99,9 @@
                 <button onclick="switchMode('scan')" id="tab-scan" class="flex-1 py-4 text-center font-semibold text-sm uppercase tracking-widest text-gray-400 border-b-2 border-transparent hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     Scan
                 </button>
+                <button onclick="switchMode('nfc')" id="tab-nfc" class="flex-1 py-4 text-center font-semibold text-sm uppercase tracking-widest text-gray-400 border-b-2 border-transparent hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    NFC
+                </button>
             </div>
 
             <!-- GENERATOR VIEW -->
@@ -162,6 +165,77 @@
                     <p id="scanResultText" class="font-mono text-sm text-green-900 dark:text-green-100 break-all"></p>
                 </div>
             </div>
+            <!-- NFC VIEW -->
+            <div id="view-nfc" class="hidden p-6 md:p-10 space-y-6">
+
+                <!-- NFC not supported banner -->
+                <div id="nfc-unsupported" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-3xl text-amber-500 mb-2 block">wifi_off</span>
+                    <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">Web NFC is not supported in this browser.</p>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Use Chrome on an Android device to read/write NFC tags.</p>
+                </div>
+
+                <!-- NFC sub-tabs -->
+                <div id="nfc-panel" class="space-y-6">
+                    <div class="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-1">
+                        <button onclick="switchNfcMode('read')" id="nfc-tab-read" class="flex-1 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-gray-700 text-primary shadow transition-all">
+                            Read Tag
+                        </button>
+                        <button onclick="switchNfcMode('write')" id="nfc-tab-write" class="flex-1 py-2 rounded-lg text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all">
+                            Write Tag
+                        </button>
+                    </div>
+
+                    <!-- READ MODE -->
+                    <div id="nfc-read-panel" class="space-y-5">
+                        <div class="flex flex-col items-center gap-4 py-4">
+                            <div id="nfc-read-icon" class="size-24 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center transition-all">
+                                <span class="material-symbols-outlined text-5xl text-primary">nfc</span>
+                            </div>
+                            <p id="nfc-read-status" class="text-sm text-gray-500 dark:text-gray-400 text-center">Press the button below then hold your NFC tag near the device.</p>
+                        </div>
+                        <div class="flex justify-center gap-3">
+                            <button id="nfc-start-read-btn" onclick="startNfcRead()" class="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
+                                <span class="material-symbols-outlined">sensors</span> Start Reading
+                            </button>
+                            <button id="nfc-stop-read-btn" onclick="stopNfcRead()" class="hidden px-8 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/25 flex items-center gap-2">
+                                <span class="material-symbols-outlined">stop</span> Stop
+                            </button>
+                        </div>
+                        <div id="nfc-read-result" class="hidden bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-widest">Tag Content</span>
+                                <button onclick="copyNfcResult()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs font-bold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">content_copy</span> Copy
+                                </button>
+                            </div>
+                            <div id="nfc-serial" class="text-[10px] text-indigo-400 font-mono"></div>
+                            <div id="nfc-read-records" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- WRITE MODE -->
+                    <div id="nfc-write-panel" class="hidden space-y-5">
+                        <div>
+                            <label class="block mb-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Content to Write</label>
+                            <textarea id="nfc-write-input" class="w-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl p-4 text-base text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-0 resize-none min-h-[100px] transition-colors" placeholder="Enter URL or text to write to the NFC tag..."></textarea>
+                        </div>
+                        <div class="flex flex-col items-center gap-4">
+                            <div id="nfc-write-icon" class="size-24 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center transition-all">
+                                <span class="material-symbols-outlined text-5xl text-green-600">edit</span>
+                            </div>
+                            <p id="nfc-write-status" class="text-sm text-gray-500 dark:text-gray-400 text-center">Enter content above, then press Write and hold your NFC tag near the device.</p>
+                        </div>
+                        <div class="flex justify-center">
+                            <button id="nfc-write-btn" onclick="writeNfcTag()" class="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-600/25 flex items-center gap-2">
+                                <span class="material-symbols-outlined">stylus</span> Write to Tag
+                            </button>
+                        </div>
+                        <div id="nfc-write-result" class="hidden rounded-xl p-4 text-sm font-semibold text-center"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- History Section (inspired by Template 1) -->
@@ -214,45 +288,46 @@
             return;
         }
         
-        container.innerHTML = historyData.map(item => `
+        const iconMap = {
+            'generate': { icon: 'qr_code_2', color: 'text-primary' },
+            'scan':     { icon: 'qr_code_scanner', color: 'text-green-500' },
+            'nfc-read': { icon: 'nfc', color: 'text-indigo-500' },
+            'nfc-write':{ icon: 'stylus', color: 'text-purple-500' },
+        };
+        container.innerHTML = historyData.map(item => {
+            const meta = iconMap[item.type] || { icon: 'history', color: 'text-gray-500' };
+            return `
             <div class="min-w-[200px] bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col gap-2">
-                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${item.type === 'scan' ? 'text-green-500' : 'text-primary'}">
-                    <span class="material-symbols-outlined text-sm">${item.type === 'scan' ? 'qr_code_scanner' : 'qr_code_2'}</span>
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${meta.color}">
+                    <span class="material-symbols-outlined text-sm">${meta.icon}</span>
                     ${item.type}
                 </div>
                 <p class="text-sm text-gray-700 dark:text-gray-300 truncate font-mono" title="${item.content}">${item.content}</p>
                 <div class="text-[10px] text-gray-400">${new Date(item.date).toLocaleTimeString()}</div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     }
 
     // --- TABS LOGIC ---
     function switchMode(mode) {
-        // Toggle Buttons
-        const btnGen = document.getElementById('tab-generate');
-        const btnScan = document.getElementById('tab-scan');
-        const viewGen = document.getElementById('view-generate');
-        const viewScan = document.getElementById('view-scan');
+        const tabs = ['generate', 'scan', 'nfc'];
+        tabs.forEach(t => {
+            const btn = document.getElementById('tab-' + t);
+            const view = document.getElementById('view-' + t);
+            if (t === mode) {
+                btn.classList.add('text-primary', 'border-primary');
+                btn.classList.remove('text-gray-400', 'border-transparent');
+                view.classList.remove('hidden');
+            } else {
+                btn.classList.remove('text-primary', 'border-primary');
+                btn.classList.add('text-gray-400', 'border-transparent');
+                view.classList.add('hidden');
+            }
+        });
 
-        if (mode === 'generate') {
-            btnGen.classList.add('text-primary', 'border-primary');
-            btnGen.classList.remove('text-gray-400', 'border-transparent');
-            btnScan.classList.remove('text-primary', 'border-primary');
-            btnScan.classList.add('text-gray-400', 'border-transparent');
-            
-            viewGen.classList.remove('hidden');
-            viewScan.classList.add('hidden');
-            
-            stopScanner(); // Save resources
-        } else {
-            btnScan.classList.add('text-primary', 'border-primary');
-            btnScan.classList.remove('text-gray-400', 'border-transparent');
-            btnGen.classList.remove('text-primary', 'border-primary');
-            btnGen.classList.add('text-gray-400', 'border-transparent');
-            
-            viewScan.classList.remove('hidden');
-            viewGen.classList.add('hidden');
-        }
+        if (mode !== 'scan') stopScanner();
+        if (mode !== 'nfc') stopNfcRead();
+        if (mode === 'nfc') checkNfcSupport();
     }
 
     // --- GENERATOR LOGIC ---
@@ -374,6 +449,176 @@
         navigator.clipboard.writeText(text).then(() => {
             alert("Copied to clipboard!");
         });
+    }
+
+    // --- NFC LOGIC ---
+    let nfcReader = null;
+    let nfcAbortController = null;
+    let nfcCurrentMode = 'read';
+
+    function checkNfcSupport() {
+        const unsupportedBanner = document.getElementById('nfc-unsupported');
+        const nfcPanel = document.getElementById('nfc-panel');
+        if (!('NDEFReader' in window)) {
+            unsupportedBanner.classList.remove('hidden');
+            nfcPanel.classList.add('hidden');
+        } else {
+            unsupportedBanner.classList.add('hidden');
+            nfcPanel.classList.remove('hidden');
+        }
+    }
+
+    function switchNfcMode(mode) {
+        nfcCurrentMode = mode;
+        stopNfcRead();
+
+        const readTab = document.getElementById('nfc-tab-read');
+        const writeTab = document.getElementById('nfc-tab-write');
+        const readPanel = document.getElementById('nfc-read-panel');
+        const writePanel = document.getElementById('nfc-write-panel');
+
+        if (mode === 'read') {
+            readTab.classList.add('bg-white', 'dark:bg-gray-700', 'text-primary', 'shadow');
+            readTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+            writeTab.classList.remove('bg-white', 'dark:bg-gray-700', 'text-primary', 'shadow');
+            writeTab.classList.add('text-gray-500', 'dark:text-gray-400');
+            readPanel.classList.remove('hidden');
+            writePanel.classList.add('hidden');
+        } else {
+            writeTab.classList.add('bg-white', 'dark:bg-gray-700', 'text-primary', 'shadow');
+            writeTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+            readTab.classList.remove('bg-white', 'dark:bg-gray-700', 'text-primary', 'shadow');
+            readTab.classList.add('text-gray-500', 'dark:text-gray-400');
+            writePanel.classList.remove('hidden');
+            readPanel.classList.add('hidden');
+        }
+    }
+
+    async function startNfcRead() {
+        const startBtn = document.getElementById('nfc-start-read-btn');
+        const stopBtn = document.getElementById('nfc-stop-read-btn');
+        const status = document.getElementById('nfc-read-status');
+        const icon = document.getElementById('nfc-read-icon');
+        const result = document.getElementById('nfc-read-result');
+
+        result.classList.add('hidden');
+
+        try {
+            nfcAbortController = new AbortController();
+            nfcReader = new NDEFReader();
+
+            await nfcReader.scan({ signal: nfcAbortController.signal });
+
+            startBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+            status.textContent = 'Scanning… Hold an NFC tag near your device.';
+            icon.classList.add('animate-pulse');
+
+            nfcReader.onreading = ({ message, serialNumber }) => {
+                stopNfcRead();
+                icon.classList.remove('animate-pulse');
+                status.textContent = 'Tag detected!';
+
+                const records = [];
+                for (const record of message.records) {
+                    let value = '';
+                    if (record.recordType === 'text') {
+                        const decoder = new TextDecoder(record.encoding || 'utf-8');
+                        value = decoder.decode(record.data);
+                    } else if (record.recordType === 'url') {
+                        const decoder = new TextDecoder();
+                        value = decoder.decode(record.data);
+                    } else {
+                        value = `[${record.recordType}] (binary data)`;
+                    }
+                    records.push({ type: record.recordType, value });
+                }
+
+                document.getElementById('nfc-serial').textContent = serialNumber ? 'Serial: ' + serialNumber : '';
+                document.getElementById('nfc-read-records').innerHTML = records.map(r => `
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-indigo-100 dark:border-indigo-800">
+                        <div class="text-[10px] text-indigo-400 uppercase font-bold mb-1">${r.type}</div>
+                        <p class="font-mono text-sm text-gray-800 dark:text-gray-200 break-all">${r.value}</p>
+                    </div>
+                `).join('');
+
+                result.classList.remove('hidden');
+
+                const summary = records.map(r => r.value).join(' | ');
+                saveToHistory('nfc-read', summary || 'NFC tag (no text records)');
+            };
+
+            nfcReader.onreadingerror = () => {
+                status.textContent = 'Could not read the tag. Try again.';
+            };
+
+        } catch (err) {
+            status.textContent = 'Error: ' + err.message;
+            startBtn.classList.remove('hidden');
+            stopBtn.classList.add('hidden');
+            icon.classList.remove('animate-pulse');
+        }
+    }
+
+    function stopNfcRead() {
+        if (nfcAbortController) {
+            nfcAbortController.abort();
+            nfcAbortController = null;
+        }
+        const startBtn = document.getElementById('nfc-start-read-btn');
+        const stopBtn = document.getElementById('nfc-stop-read-btn');
+        const icon = document.getElementById('nfc-read-icon');
+        if (startBtn) startBtn.classList.remove('hidden');
+        if (stopBtn) stopBtn.classList.add('hidden');
+        if (icon) icon.classList.remove('animate-pulse');
+    }
+
+    async function writeNfcTag() {
+        const input = document.getElementById('nfc-write-input').value.trim();
+        const status = document.getElementById('nfc-write-status');
+        const writeResult = document.getElementById('nfc-write-result');
+        const writeBtn = document.getElementById('nfc-write-btn');
+        const icon = document.getElementById('nfc-write-icon');
+
+        if (!input) {
+            document.getElementById('nfc-write-input').classList.add('border-red-500');
+            setTimeout(() => document.getElementById('nfc-write-input').classList.remove('border-red-500'), 1000);
+            return;
+        }
+
+        writeResult.classList.add('hidden');
+        writeBtn.disabled = true;
+        writeBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        icon.classList.add('animate-pulse');
+        status.textContent = 'Hold your NFC tag near the device to write…';
+
+        try {
+            const ndef = new NDEFReader();
+            const recordType = input.startsWith('http://') || input.startsWith('https://') ? 'url' : 'text';
+            await ndef.write({ records: [{ recordType, data: input }] });
+
+            status.textContent = 'Successfully written to the tag!';
+            writeResult.className = 'rounded-xl p-4 text-sm font-semibold text-center bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300';
+            writeResult.innerHTML = '<span class="material-symbols-outlined align-middle mr-1">check_circle</span> Tag written successfully!';
+            writeResult.classList.remove('hidden');
+
+            saveToHistory('nfc-write', input);
+        } catch (err) {
+            status.textContent = 'Write failed. Make sure the tag is held still.';
+            writeResult.className = 'rounded-xl p-4 text-sm font-semibold text-center bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300';
+            writeResult.innerHTML = '<span class="material-symbols-outlined align-middle mr-1">error</span> ' + err.message;
+            writeResult.classList.remove('hidden');
+        } finally {
+            writeBtn.disabled = false;
+            writeBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            icon.classList.remove('animate-pulse');
+        }
+    }
+
+    function copyNfcResult() {
+        const records = document.querySelectorAll('#nfc-read-records p');
+        const text = Array.from(records).map(p => p.textContent).join('\n');
+        navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     }
 
     // Initialize
